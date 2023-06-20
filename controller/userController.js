@@ -7,6 +7,9 @@ const {JsonWebTokenError} = require("jsonwebtoken");
 const jwt = require("jsonwebtoken")
 const crypto = require("crypto")
 const uniqid = require("uniqid");
+const sendEmail = require("./emailController");
+const Product = require("../models/productModel")
+const Cart = require("../models/cartModel")
 
 const createUser = asyncHandler(
     async (req, res) => {
@@ -230,6 +233,7 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
             subject: "Forgot password Link",
             html: resetUrl,
         };
+        console.log("1111111")
         sendEmail(data);
         res.json( {result: true})
     } catch (error) {
@@ -256,14 +260,39 @@ const resetPassword = asyncHandler(async (req, res) => {
 
 
 const getWishlist = asyncHandler(async (req, res) => {
+    console.log("111")
     const { _id } = req.user;
+    console.log(_id)
     try {
         const findUser = await User.findById(_id).populate("wishlist");
+        console.log(findUser)
         res.json(findUser);
     } catch (error) {
         throw new Error(error);
     }
 });
+const getCompare = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+    try {
+        const findUser = await User.findById(_id).populate("compare");
+        console.log(findUser)
+        res.json(findUser);
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
+const getCart = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+    try {
+        const findUser = await User.findById(_id).populate('cart.product');
+        console.log(findUser);
+        res.json(findUser);
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
 
 const saveAddress = asyncHandler(async (req, res, next) => {
     const { _id } = req.user;
@@ -286,6 +315,7 @@ const saveAddress = asyncHandler(async (req, res, next) => {
 });
 
 const userCart = asyncHandler(async (req, res) => {
+    console.log("12")
     const { cart } = req.body;
     const { _id } = req.user;
     validateMongoDbId(_id);
@@ -393,12 +423,12 @@ const createOrder = asyncHandler(async (req, res) => {
 const getOrders = asyncHandler(async (req, res) => {
     const { _id } = req.user;
     validateMongoDbId(_id);
+
     try {
-        const userorders = await Order.findOne({ orderby: _id })
-            .populate("products.product")
-            .populate("orderby")
-            .exec();
-        res.json(userorders);
+        const user = await User.findById(_id).populate("buyersа.product");
+
+        console.log(user)
+        res.json(user.buyersа);
     } catch (error) {
         throw new Error(error);
     }
@@ -470,5 +500,7 @@ module.exports = {
     getUserCart,
     emptyCart,
     createOrder,
-    getOrders
+    getOrders,
+    getCompare,
+    getCart
 }
