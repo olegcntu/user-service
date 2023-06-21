@@ -27,6 +27,9 @@ const createUser = asyncHandler(
 const loginUserController = asyncHandler(async (req, res) => {
     const {email, password} = req.body;
     const findUser = await User.findOne({email});
+    if (findUser.isBlocked) {
+        throw new Error('User is blocked');
+    }
     if (findUser && await findUser.isPasswordMatched(password)) {
         const refreshToken = await generateRefreshToken(findUser?._id)
         const updateuser = await User.findByIdAndUpdate(findUser.id, {
@@ -43,6 +46,7 @@ const loginUserController = asyncHandler(async (req, res) => {
             email: findUser?.email,
             mobile: findUser?.mobile,
             token: generateToken(findUser?._id),
+            role: findUser?.role,
         });
     } else {
         throw new Error("Invalid Credentials")
