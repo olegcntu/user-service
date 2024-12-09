@@ -103,6 +103,29 @@ const getAUser = asyncHandler(async (req, res) => {
     }
 })
 
+const getAUserByEmail = asyncHandler(async (req, res) => {
+    const { email } = req.params; // Получаем email из параметров запроса
+
+    try {
+        // Ищем пользователя по email
+        const getAUser = await User.findOne({ email });
+
+        // Если пользователь не найден, возвращаем ошибку
+        if (!getAUser) {
+            res.status(404);
+            throw new Error('User not found');
+        }
+
+        // Возвращаем найденного пользователя
+        res.json({
+            user: getAUser,
+        });
+    } catch (error) {
+        res.status(500);
+        throw new Error(error.message || 'Error retrieving user by email');
+    }
+});
+
 const deleteAUser = asyncHandler(async (req, res) => {
     const {id} = req.params;
     validateMongoDbId(id)
@@ -488,6 +511,7 @@ module.exports = {
     loginUserController,
     getAllUser,
     getAUser,
+    getAUserByEmail,
     deleteAUser,
     updateAUser,
     blockUser,

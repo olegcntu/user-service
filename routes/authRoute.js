@@ -4,6 +4,7 @@ const {
     loginUserController,
     getAllUser,
     getAUser,
+    getAUserByEmail,
     deleteAUser,
     updateAUser,
     blockUser,
@@ -42,6 +43,7 @@ router.get('/compare',authMiddleware, getCompare)
 router.get('/cart',authMiddleware, getCart)
 router.get('/logout', logout)
 router.get('/:id', authMiddleware, isAdmin, getAUser)
+router.get('/get-by-email/:email', getAUserByEmail)
 router.delete('/:id', deleteAUser)
 router.put('/edit-user', authMiddleware, updateAUser)
 router.put('/block-user/:id', authMiddleware, isAdmin, blockUser)
